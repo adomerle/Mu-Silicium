@@ -1,0 +1,11 @@
+[Defines]
+  DEC_SPECIFICATION                   = 0x00010005
+  PACKAGE_NAME                        = GooglePkg
+  PACKAGE_GUID                        = 4DBA22A9-A2D6-4CD7-875B-595D53245BBC
+  PACKAGE_VERSION                     = 0.1
+
+[Includes]
+  Include                               # Root include for the package
+
+[Guids]
+  gGooglePkgTokenSpaceGuid           = { 0x4DBA22A9, 0xA2D6, 0x4CD7, { 0x87, 0x5B, 0x59, 0x5D, 0x53, 0x24, 0x5B, 0xBC } }
