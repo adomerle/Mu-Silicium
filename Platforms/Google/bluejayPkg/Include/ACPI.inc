@@ -1,0 +1,20 @@
+#FILE FREEFORM = 7E374E25-8E01-4FEE-87F2-390C23C606CD {
+#  SECTION RAW = Gs101Pkg/AcpiTables/APIC.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/APIC.UniCore.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/BERT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/BGRT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/CSRT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/DBG2.aml
+#  SECTION RAW = bluejayPkg/AcpiTables/DSDT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/FACP.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/FPDT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/GTDT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/IORT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/MCFG.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/MSDM.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/PPTT.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/SPCR.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/TPM2.aml
+#  SECTION RAW = Gs101Pkg/AcpiTables/XSDT.aml
+#  SECTION UI = "AcpiTables"
+#}

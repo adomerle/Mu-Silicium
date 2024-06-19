@@ -4,7 +4,7 @@ CROSS_COMPILE     = $(TARGET)-
 CC                = $(CROSS_COMPILE)gcc
 OBJCOPY           = $(CROSS_COMPILE)objcopy
 
-all: BootShim.elf BootShim.bin
+all: BootShim.elf BootShim.bin BootShim.quirky.elf BootShim.quirky.bin
 
 BootShim.bin: BootShim.elf
 	$(OBJCOPY) -O binary $< $@
@@ -12,4 +12,12 @@ BootShim.bin: BootShim.elf
 BootShim.elf: BootShim.S
 	$(CC) -c $< -o $@ -DUEFI_BASE=$(UEFI_BASE) -DUEFI_SIZE=$(UEFI_SIZE)
 
+BootShim.quirky.bin: BootShim.quirky.elf
+	$(OBJCOPY) -O binary $< $@
+
+BootShim.quirky.elf: BootShim.quirky.S
+	$(CC) -c $< -o $@ -DUEFI_BASE=$(UEFI_BASE) -DUEFI_SIZE=$(UEFI_SIZE)
+
 BootShim.S:
+
+BootShim.quirky.S:
