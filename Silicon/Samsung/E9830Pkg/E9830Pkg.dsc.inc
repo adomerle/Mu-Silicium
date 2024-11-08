@@ -9,9 +9,19 @@
 ##
 
 [Defines]
-  USE_CUSTOM_GIC     = 0
-  USE_CUSTOM_TIMER   = 0
-  USE_PHYSICAL_TIMER = 0
+  # GIC
+  USE_CUSTOM_GIC                             = 0
+
+  # Timer
+  USE_CUSTOM_TIMER                           = 0
+  USE_PHYSICAL_TIMER                         = 0
+
+  # KEP
+  ENABLE_KEP                                 = 0
+  HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA         = 0
+  HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA   = 0
+  HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA = 0
+  HAS_PSCI_MEMPROTECT_FAILING_ERRATA         = 0
 
 [BuildOptions]
   *_*_AARCH64_CC_FLAGS = -march=armv8.2-a+crypto+rcpc
@@ -41,10 +51,10 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|3
 
 [LibraryClasses]
-  PlatformPeiLib|E9830Pkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   PlatformPrePiLib|E9830Pkg/Library/PlatformPrePiLib/PlatformPrePiLib.inf
-  HwResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  AcpiPlatformUpdateLib|SiliciumPkg/Library/AcpiPlatformUpdateLibNull/AcpiPlatformUpdateLibNull.inf
+  HwResetSystemLib|E9830Pkg/Library/ResetSystemLib/ResetSystemLib.inf
+  ResetSystemLib|E9830Pkg/Library/ResetSystemLib/ResetSystemLib.inf
   SoCPlatformLib|E9830Pkg/Library/SoCPlatformLib/SoCPlatformLib.inf
   ExynosSpeedyLib|E9830Pkg/Library/ExynosSpeedyLib/ExynosSpeedyLib.inf
 

@@ -5,6 +5,7 @@
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 
   #INF Binaries/nitrogen/QcomPkg/Drivers/TzDxe/TzDxeLA.inf
+  INF Binaries/nitrogen/QcomPkg/Drivers/MdtpDxe/MdtpDxe.inf
 
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -28,7 +29,6 @@
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/nitrogen/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
@@ -51,6 +51,7 @@
 
   INF Binaries/nitrogen/QcomPkg/Drivers/HWIODxe/HWIODxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/I2CDxe/I2CDxe.inf
+  INF Binaries/nitrogen/QcomPkg/Drivers/SPIDxe/SPIDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/SPMIDxe/SPMIDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
@@ -58,6 +59,7 @@
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/nitrogen/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
+  INF QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif
@@ -65,12 +67,17 @@
   INF Binaries/nitrogen/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/PmicDxe/PmicDxeLa.inf
-  #INF Binaries/nitrogen/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
+  INF Binaries/nitrogen/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLA.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/AdcDxe/AdcDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/TsensDxe/TsensDxe.inf
+  INF Binaries/nitrogen/QcomPkg/Drivers/LimitsDxe/LimitsDxe.inf
+  INF Binaries/nitrogen/QcomPkg/Drivers/MpPowerDxe/MpPowerDxe.inf
   INF Binaries/nitrogen/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
 
+  INF Binaries/generic/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
+  INF Binaries/generic/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
+  
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
@@ -83,3 +90,5 @@
   INF Binaries/nitrogen/QcomPkg/Drivers/RNGDxe/RngDxe.inf
 
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  
+  INF Binaries/nitrogen/QcomPkg/Drivers/QdssDxe/QdssDxe.inf

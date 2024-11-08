@@ -10,13 +10,13 @@
 
 #include <Library/DebugLib.h>
 #include <Library/DeviceBootManagerLib.h>
-#include <Library/BdsExtensionLib.h>
 #include <Library/MsBootManagerSettingsLib.h>
 #include <Library/MsBootOptionsLib.h>
 #include <Library/MsBootPolicyLib.h>
 #include <Library/BootGraphicsLib.h>
 #include <Library/BootGraphics.h>
 #include <Library/GraphicsConsoleHelperLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/MsPlatformDevicesLib.h>
 #include <Library/MsPlatformPowerCheckLib.h>
 #include <Library/PcdLib.h>
@@ -306,13 +306,6 @@ EnableOSK ()
   }
 }
 
-/**
-  Pre Ready to Boot Callback to Lock BDS Variables.
-
-  @param  Event               - Event whose Notification Function is being Invoked.
-  @param  Context             - The Pointer to the Notification Function's Context,
-                                which is Implementation-dependent.
-**/
 STATIC
 VOID
 EFIAPI
@@ -326,13 +319,6 @@ PreReadyToBoot (
   gBS->CloseEvent (Event);
 }
 
-/**
-  Post Ready to Boot Callback to Update FACS Hardware Signature.
-
-  @param  Event               - Event whose Notification Function is being Invoked.
-  @param  Context             - The Pointer to the Notification Function's Context,
-                                which is Implementation-dependent.
-**/
 STATIC
 VOID
 EFIAPI
@@ -343,11 +329,6 @@ PostReadyToBoot (
   // Do Nothing
 }
 
-/**
-  This runs when BdsDxe is Loaded, Before BdsArch Protocol is Published.
-
-  @return                     - EFI_SUCCESS
-**/
 EFI_STATUS
 EFIAPI
 DeviceBootManagerConstructor (
@@ -405,7 +386,8 @@ EFI_DEVICE_PATH_PROTOCOL**
 EFIAPI
 DeviceBootManagerAfterConsole ()
 {
-  EFI_STATUS Status;
+  EFI_STATUS                    Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *mConsoleOutHandle;
 
   // Check if System is Good to Go
   MsPreBootChecks ();
@@ -419,8 +401,55 @@ DeviceBootManagerAfterConsole ()
     DEBUG ((EFI_D_ERROR, "%a: Failed to Display Boot Logo! Status = %r\n", __FUNCTION__, Status));
   }
 
-  // Run SoC Specific After Console Function
-  BdsExtensionAfterConsole ();
+  // Locate Console Out Handle
+  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID *)&mConsoleOutHandle);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: Failed to Locate Console Out Protocol! Status %r\n", __FUNCTION__, Status));
+  } else {
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  White;
+    CHAR16                        *ComboMessage;
+
+    // Combo Message
+    if (FixedPcdGetPtr(PcdSpecialApp) == "NULL") {
+#if HAS_BUILD_IN_KEYBOARD == 1
+      ComboMessage = L"[Escape] UEFI Menu";
+#else
+      ComboMessage = L"[Volume Up] UEFI Menu";
+#endif
+    } else {
+      // More Memory for Combo Message
+      ComboMessage = AllocateZeroPool (150);
+      if (ComboMessage == NULL) {
+        DEBUG ((EFI_D_ERROR, "Failed to Allocate Memory for Combo Message! Status = %r\n", Status));
+        goto exit;
+      }
+
+#if HAS_BUILD_IN_KEYBOARD == 1
+      UnicodeSPrint (ComboMessage, 150, L"[Escape] UEFI Menu - [Delete] %a", FixedPcdGetPtr(PcdSpecialAppName));
+#else
+      UnicodeSPrint (ComboMessage, 150, L"[Volume Up] UEFI Menu - [Volume Down] %a", FixedPcdGetPtr(PcdSpecialAppName));
+#endif
+    }
+
+    // Set Pos for Combo Message
+    UINTN XPos = (mConsoleOutHandle->Mode->Info->HorizontalResolution - StrLen(ComboMessage) * EFI_GLYPH_WIDTH) / 2;
+    UINTN YPos = (mConsoleOutHandle->Mode->Info->VerticalResolution - EFI_GLYPH_HEIGHT) * 48 / 50;
+
+    // Set Color for the Message
+    Black.Blue = Black.Green = Black.Red = Black.Reserved = 0x00;
+    White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
+
+    // Display Combo Message
+    PrintXY (XPos, YPos, &White, &Black, ComboMessage);
+
+exit:
+    if (FixedPcdGetPtr(PcdSpecialApp) != "NULL") {
+      if (ComboMessage != NULL) {
+        FreePool (ComboMessage);
+      }
+    }
+  }
 
   return GetPlatformConnectList ();
 }
@@ -462,18 +491,33 @@ DeviceBootManagerProcessBootCompletion (IN EFI_BOOT_MANAGER_LOAD_OPTION *BootOpt
   }
 }
 
-/**
-  Check for Pressed Keys during Boot.
-
-  @param BootOption           - Boot Option Filled in, Based on which Key is Pressed.
-
-  @return Status              - The EFI_STATUS returned by this Function.
-**/
 EFI_STATUS
 EFIAPI
 DeviceBootManagerPriorityBoot (EFI_BOOT_MANAGER_LOAD_OPTION *BootOption)
 {
-  return BdsExtensionPriorityBoot (BootOption);
+  EFI_STATUS  Status        = EFI_SUCCESS;
+  BOOLEAN     FrontPageBoot = MsBootPolicyLibIsSettingsBoot ();
+  BOOLEAN     SpecificApp   = MsBootPolicyLibIsAltBoot ();
+
+  MsBootPolicyLibClearBootRequests ();
+
+  //
+  // There are four cases:
+  //   1.  Nothing pressed.           - Return EFI_NOT_FOUND.
+  //   2.  FrontPageBoot              - Load FrontPage.
+  //   3.  SpecificApp                - Load SoC Specific App.
+  //
+
+  if (SpecificApp) {
+    Status = MsBootOptionsLibGetDefaultBootApp (BootOption, "VOL-");
+  } else if (FrontPageBoot) {
+    Status = MsBootOptionsLibGetBootManagerMenu (BootOption, "VOL+");
+    SetRebootReason (OEM_REBOOT_TO_SETUP_KEY);
+  } else {
+    Status = EFI_NOT_FOUND;
+  }
+
+  return Status;
 }
 
 VOID

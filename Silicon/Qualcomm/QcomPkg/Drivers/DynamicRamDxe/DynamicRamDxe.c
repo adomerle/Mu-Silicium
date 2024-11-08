@@ -22,7 +22,7 @@ AddRamPartition (
   EFI_STATUS          Status;
   EFI_GCD_MEMORY_TYPE EfiGcdMemoryType;
 
-  if (Length == 0) { return; }
+  if (Length <= 0) { return; }
 
   switch (EfiMemoryType) {
     case EfiReservedMemoryType:
@@ -89,21 +89,15 @@ AddRamPartitions (
   IN EFI_SYSTEM_TABLE *SystemTable)
 {
   EFI_STATUS                       Status              = EFI_SUCCESS;
+  PARM_MEMORY_REGION_DESCRIPTOR_EX MemoryDescriptor    = gExtendedMemoryDescriptor;
+  RamPartitionTable               *RamPartitionTable   = NULL;
   UINTN                            Index               = 1;
   UINT32                           NumPartitions       = 0;
   UINT32                           PartitionVersion    = 0;
-  PARM_MEMORY_REGION_DESCRIPTOR_EX MemoryDescriptor    = gExtendedMemoryDescriptor;
-  RamPartitionTable               *RamPartitionTable   = NULL;
 
   // Get RAM Partition Infos
   Status = GetRamPartitions (&RamPartitionTable, &PartitionVersion);
   ASSERT_EFI_ERROR (Status);
-
-  // Get Number of RAM Partitions
-  NumPartitions = RamPartitionTable->NumPartitions;
-
-  // Sort all RAM Partitions
-  PerformQuickSort (RamPartitionTable->RamPartitionEntry, NumPartitions, sizeof(RamPartitionEntry), CompareBaseAddress);
 
   // Print RAM Partition Version
   if (PartitionVersion == 1) { 
@@ -112,6 +106,12 @@ AddRamPartitions (
   } else {
     DEBUG ((EFI_D_WARN, "RAM Partition Version: %d\n", PartitionVersion));
   }
+
+  // Get Number of RAM Partitions
+  NumPartitions = RamPartitionTable->NumPartitions;
+
+  // Sort all RAM Partitions
+  PerformQuickSort (RamPartitionTable->RamPartitionEntry, NumPartitions, sizeof(RamPartitionEntry), CompareBaseAddress);
 
   for (INT32 i = 0; i < NumPartitions; i++) {
     // Check if the RAM Partition is Invalid

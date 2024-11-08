@@ -43,17 +43,17 @@ for Device in $DEVICES; do
 	# Include Device Config if it exists
 	if [ -f "Resources/Configs/${Device}.conf" ]
 	then source "Resources/Configs/${Device}.conf"
-	else _error "\nDevice configuration not found!\nCheck if your .conf File is in the 'configs' Folder\n"
+	else _error "\nDevice configuration not found from ${Device}!\nCheck if your .conf File is in the 'configs' Folder\n"
 	fi
 
 	# Check if the Device has Multiple Models
 	if [ ${TARGET_MULTIPLE_MODELS} == "TRUE" ]; then
 		# If device has it build device with models
 		for ((Model = 0; Model < $TARGET_NUMBER_OF_MODELS; Model++)); do
-			bash ./build_uefi.sh -d $Device -r $_TARGET_BUILD_MODE -m $Model
+			bash ./build_uefi.sh -d $Device -r $_TARGET_BUILD_MODE -m $Model || exit $?
 		done
 	else
 		# If device don't have it just run build script
-		bash ./build_uefi.sh -d $Device -r $_TARGET_BUILD_MODE
+		bash ./build_uefi.sh -d $Device -r $_TARGET_BUILD_MODE || exit $?
 	fi
 done

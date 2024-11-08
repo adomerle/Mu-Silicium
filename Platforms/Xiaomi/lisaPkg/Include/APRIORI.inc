@@ -1,5 +1,4 @@
 APRIORI DXE {
-
   # First, install the PCD driver and call DxeInit
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -17,7 +16,6 @@ APRIORI DXE {
   # Core Drivers
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/lisa/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
 
@@ -113,6 +111,7 @@ APRIORI DXE {
   INF Binaries/lisa/QcomPkg/Drivers/LimitsDxe/LimitsDxe.inf
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/lisa/QcomPkg/Drivers/CPRDxe/CPRDxe.inf
+  INF QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe.inf
 !endif
   INF Binaries/lisa/QcomPkg/Drivers/GpiDxe/GpiDxe.inf
   INF Binaries/lisa/QcomPkg/Drivers/UCDxe/UCDxe.inf

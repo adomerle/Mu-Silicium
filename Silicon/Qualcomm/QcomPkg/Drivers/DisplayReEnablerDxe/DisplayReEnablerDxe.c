@@ -16,25 +16,21 @@ ReEnableDisplay (
   Status = gBS->LocateProtocol (&gEfiDisplayPowerStateProtocolGuid, NULL, (VOID *)&mDisplayPowerProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to Locate Display Power State Protocol! Status = %r\n", Status));
-    goto exit;
+    return Status;
   }
 
   // Turn Off Display
   Status = mDisplayPowerProtocol->SetDisplayPowerState (mDisplayPowerProtocol, EfiDisplayPowerStateOff);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to Turn Off Display! Status = %r\n", Status));
-    goto exit;
+    return Status;
   }
 
   // Wait a bit
   gBS->Stall (1000);
 
   // Turn On Display
-  Status = mDisplayPowerProtocol->SetDisplayPowerState (mDisplayPowerProtocol, EfiDisplayPowerStateOn);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to Turn On Display!\n"));
-  }
+  mDisplayPowerProtocol->SetDisplayPowerState (mDisplayPowerProtocol, EfiDisplayPowerStateOn);
 
-exit:
-  return Status;
+  return EFI_SUCCESS;
 }

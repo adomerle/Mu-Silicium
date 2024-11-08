@@ -27,7 +27,6 @@
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/pong/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
   INF Binaries/pong/QcomPkg/Drivers/IPCCDxe/IPCCDxe.inf
@@ -74,16 +73,17 @@
   INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 
-!if $(USE_DISPLAYDXE) == 1
+!if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/pong/QcomPkg/Drivers/CPRDxe/CPRDxe.inf
 !endif
   INF Binaries/pong/QcomPkg/Drivers/GpiDxe/GpiDxe.inf
   INF Binaries/pong/QcomPkg/Drivers/SPIDxe/SPIDxe.inf
   INF Binaries/pong/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
-  #INF Binaries/pong/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.inf
+  INF Binaries/pong/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.inf
 
-!if $(USE_DISPLAYDXE) == 1
+!if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/pong/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
+  INF QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif

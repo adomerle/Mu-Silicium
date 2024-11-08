@@ -45,11 +45,85 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/IoLib.h>
+#include <Library/MemoryMapHelperLib.h>
 
 #include <Protocol/Smbios.h>
 
+#include <libfdt.h>
+
 #include "DataDefinitions.h"
+
+typedef struct {
+  UINT64 StartAddress;
+  UINT64 Size;
+} MEMORY_NODE;
+
+MEMORY_NODE*
+GetMemoryNodes(const void *fdt, UINTN *NodeCount) {
+  INT32 Node;
+  INT32 AddrCells, SizeCells;
+  CONST UINT32 *Reg;
+  INT32 Len;
+  UINTN Count = 0;
+  MEMORY_NODE *Nodes = NULL;
+  UINTN CurrentSize = 0;
+
+  Node = fdt_path_offset(fdt, "/");
+
+  if (Node < 0) {
+    DEBUG((EFI_D_ERROR, "Error finding root node: %a\n", fdt_strerror(Node)));
+    ASSERT(FALSE);
+  }
+
+  AddrCells = fdt_address_cells(fdt, Node);
+  SizeCells = fdt_size_cells(fdt, Node);
+  if (AddrCells < 0 || SizeCells < 0) {
+      DEBUG((EFI_D_ERROR, "Error finding address or size cells\n"));
+      ASSERT(FALSE);
+  }
+
+  fdt_for_each_subnode(Node, fdt, Node) {
+    CONST CHAR8 *DeviceType = fdt_getprop(fdt, Node, "device_type", NULL);
+
+    if (DeviceType && AsciiStrCmp(DeviceType, "memory") == 0) {
+      Reg = fdt_getprop(fdt, Node, "reg", &Len);
+
+      if (!Reg) {
+        DEBUG((EFI_D_ERROR, "Error reading 'reg' property: %a\n", fdt_strerror(Len)));
+        ASSERT(FALSE);
+      }
+
+      INT32 RegSize = (AddrCells + SizeCells) * sizeof(UINT32);
+      INT32 NumRegs = Len / RegSize;
+      UINTN NewSize = (Count + NumRegs) * sizeof(MEMORY_NODE);
+
+      Nodes = ReallocatePool(CurrentSize, NewSize, Nodes);
+      CurrentSize = NewSize;
+
+      for (INT32 i = 0; i < NumRegs; i++) {
+        UINT64 Start = 0, Size = 0;
+
+        for (INT32 j = 0; j < AddrCells; j++) {
+          Start = (Start << 32) | fdt32_to_cpu(Reg[i * (AddrCells + SizeCells) + j]);
+        }
+
+        for (INT32 j = 0; j < SizeCells; j++) {
+          Size = (Size << 32) | fdt32_to_cpu(Reg[i * (AddrCells + SizeCells) + AddrCells + j]);
+        }
+
+        Nodes[Count].StartAddress = Start;
+        Nodes[Count].Size = Size;
+        Count++;
+      }
+    }
+  }
+
+  *NodeCount = Count;
+  return Nodes;
+}
 
 EFI_STATUS
 EFIAPI
@@ -122,9 +196,16 @@ LogSmbiosData (
 VOID
 BIOSInfoUpdateSmbiosType0 ()
 {
+  CHAR8 FirmwareVendor[100] = "";
+
+  // Give Space to FirmwareVendor Variable
+  ZeroMem (FirmwareVendor, 100);
+
+  // Append Device Maintainer
+  AsciiSPrint (FirmwareVendor, sizeof(FirmwareVendor), "Project Silicium & %a", FixedPcdGetPtr(PcdDeviceMaintainer));
+
   // Update String Table
-  mBIOSInfoType0Strings[0] = (CHAR8 *)FixedPcdGetPtr(PcdFirmwareVendor);
-  mBIOSInfoType0Strings[1] = (CHAR8 *)FixedPcdGetPtr(PcdFirmwareVersionString);
+  mBIOSInfoType0Strings[0] = FirmwareVendor;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mBIOSInfoType0, mBIOSInfoType0Strings, NULL);
 }
@@ -215,11 +296,11 @@ CacheInfoUpdateSmbiosType7 ()
 }
 
 VOID
-PhyMemArrayInfoUpdateSmbiosType16 ()
+PhyMemArrayInfoUpdateSmbiosType16 (UINT64 SystemMemorySize)
 {
   EFI_SMBIOS_HANDLE MemArraySmbiosHande;
 
-  mPhyMemArrayInfoType16.ExtendedMaximumCapacity = FixedPcdGet64(PcdSystemMemorySize);
+  mPhyMemArrayInfoType16.ExtendedMaximumCapacity = SystemMemorySize;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mPhyMemArrayInfoType16, mPhyMemArrayInfoType16Strings, &MemArraySmbiosHande);
 
@@ -228,18 +309,18 @@ PhyMemArrayInfoUpdateSmbiosType16 ()
 }
 
 VOID
-MemDevInfoUpdateSmbiosType17 ()
+MemDevInfoUpdateSmbiosType17 (UINT64 SystemMemorySize)
 {
-  mMemDevInfoType17.Size = FixedPcdGet64(PcdSystemMemorySize) / 0x100000;
+  mMemDevInfoType17.Size = SystemMemorySize / 0x100000;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemDevInfoType17, mMemDevInfoType17Strings, NULL);
 }
 
 VOID
-MemArrMapInfoUpdateSmbiosType19 ()
+MemArrMapInfoUpdateSmbiosType19 (UINT64 SystemMemorySize)
 {
   mMemArrMapInfoType19.StartingAddress = FixedPcdGet64(PcdSystemMemoryBase) / 1024;
-  mMemArrMapInfoType19.EndingAddress   = (FixedPcdGet64(PcdSystemMemorySize) + FixedPcdGet64(PcdSystemMemoryBase) - 1) / 1024;
+  mMemArrMapInfoType19.EndingAddress   = (SystemMemorySize + FixedPcdGet64(PcdSystemMemoryBase) - 1) / 1024;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mMemArrMapInfoType19, mMemArrMapInfoType19Strings, NULL);
 }
@@ -250,6 +331,13 @@ InitializeSmBiosTable (
   IN EFI_HANDLE        ImageHandle, 
   IN EFI_SYSTEM_TABLE *SystemTable)
 {
+  EFI_STATUS 			  Status;
+  UINT64             		  SystemMemorySize = 0;
+  UINT64 	     		  DesignMemorySize = 0;
+  UINTN 	     		  NodeCount;
+  MEMORY_NODE 	     		  *Nodes;
+  ARM_MEMORY_REGION_DESCRIPTOR_EX FdtPointer;
+
   // Update SmBios Data Definitions
   BIOSInfoUpdateSmbiosType0         ();
   SysInfoUpdateSmbiosType1          ();
@@ -257,9 +345,26 @@ InitializeSmBiosTable (
   EnclosureInfoUpdateSmbiosType3    ();
   ProcessorInfoUpdateSmbiosType4    ();
   CacheInfoUpdateSmbiosType7        ();
-  PhyMemArrayInfoUpdateSmbiosType16 ();
-  MemDevInfoUpdateSmbiosType17      ();
-  MemArrMapInfoUpdateSmbiosType19   ();
+
+  Status = LocateMemoryMapAreaByName ("FDT", &FdtPointer);
+  if (!EFI_ERROR (Status)) {
+    CONST VOID *FDT = (CONST VOID*)(uintptr_t)MmioRead32(FdtPointer.Address);
+    Nodes = GetMemoryNodes(FDT, &NodeCount);
+
+    for (UINTN i = 0; i < NodeCount; i++) {
+      SystemMemorySize += Nodes[i].Size;
+    }
+
+    while (SystemMemorySize >= DesignMemorySize) {
+      DesignMemorySize += 0x40000000; // 1GiB
+    }
+
+    SystemMemorySize = DesignMemorySize;
+  }
+
+  PhyMemArrayInfoUpdateSmbiosType16 (SystemMemorySize);
+  MemDevInfoUpdateSmbiosType17      (SystemMemorySize);
+  MemArrMapInfoUpdateSmbiosType19   (SystemMemorySize);
 
   return EFI_SUCCESS;
 }

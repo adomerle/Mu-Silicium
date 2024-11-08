@@ -24,30 +24,29 @@ GetRamPartitions (
   OUT UINT32             *Version)
 {
   EFI_STATUS         Status        = EFI_SUCCESS;
-  EFI_SMEM_PROTOCOL *gSmemProtocol = NULL;
+  EFI_SMEM_PROTOCOL *mSmemProtocol = NULL;
   UINT32             SmemSize      = 0;
 
   // Locate SMEM Protocol
-  Status = gBS->LocateProtocol (&gEfiSMEMProtocolGuid, NULL, (VOID *)&gSmemProtocol);
+  Status = gBS->LocateProtocol (&gEfiSMEMProtocolGuid, NULL, (VOID *)&mSmemProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to Locate SMEM Protocol! Status = %r\n", Status));
-    goto exit;
+    return Status;
   }
 
   // Get the RAM Partition Table
-  Status = gSmemProtocol->GetFunc (SMEM_USABLE_RAM_PARTITION_TABLE, &SmemSize, (VOID *)RamPartTable);
+  Status = mSmemProtocol->GetFunc (SMEM_USABLE_RAM_PARTITION_TABLE, &SmemSize, (VOID *)RamPartTable);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to get RAM Partition Table! Status = %r\n", Status));
-    goto exit;
+    return Status;
   }
 
   // Get RAM Partition Version
   Status = GetRamPartitionVersion (*RamPartTable, Version);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to get RAM Partition Version! Status = %r\n", Status));
-    goto exit;
+    return Status;
   }
 
-exit:
-  return Status;
+  return EFI_SUCCESS;
 }

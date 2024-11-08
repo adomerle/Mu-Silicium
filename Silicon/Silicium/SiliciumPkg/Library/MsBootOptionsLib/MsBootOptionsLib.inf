@@ -40,6 +40,9 @@
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
 
+[FixedPcd]
+  gSiliciumPkgTokenSpaceGuid.PcdSpecialApp
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile
 

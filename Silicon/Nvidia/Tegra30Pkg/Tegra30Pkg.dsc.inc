@@ -9,9 +9,12 @@
 ##
 
 [Defines]
-  USE_CUSTOM_GIC     = 0             # Might be needed Later?
-  USE_CUSTOM_TIMER   = 1
-  USE_PHYSICAL_TIMER = 1
+  # GIC
+  USE_CUSTOM_GIC                             = 0   # Might be needed Later?
+
+  # Timer
+  USE_CUSTOM_TIMER                           = 1
+  USE_PHYSICAL_TIMER                         = 1
 
 [PcdsFixedAtBuild]
   # Timer
@@ -50,11 +53,12 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
 [LibraryClasses]
-  PlatformPeiLib|Tegra30Pkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   PlatformPrePiLib|Tegra30Pkg/Library/PlatformPrePiLib/PlatformPrePiLib.inf
+  AcpiPlatformUpdateLib|SiliciumPkg/Library/AcpiPlatformUpdateLibNull/AcpiPlatformUpdateLibNull.inf
   HwResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
   ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
   SoCPlatformLib|Tegra30Pkg/Library/SoCPlatformLib/SoCPlatformLib.inf
+  DynamicRamLib|Tegra30Pkg/GPLLibrary/DynamicRamLib/DynamicRamLib.inf
 
 [Components]
   Tegra30Pkg/Drivers/SmBiosTableDxe/SmBiosTableDxe.inf

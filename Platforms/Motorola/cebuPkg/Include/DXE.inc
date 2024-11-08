@@ -36,7 +36,6 @@
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/cebu/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
   INF Binaries/cebu/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
@@ -74,7 +73,6 @@
   INF Binaries/cebu/MbmPkg/Core/Drivers/AbDxe/AbDxe.inf
   INF Binaries/cebu/MbmPkg/Core/Drivers/MotSolDxe/MotSolDxe.inf
   INF Binaries/cebu/MbmPkg/Core/Drivers/BacklightDxe/BacklightDxe.inf
-
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/cebu/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf

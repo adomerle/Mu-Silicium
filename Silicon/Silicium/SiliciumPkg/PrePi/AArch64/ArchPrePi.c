@@ -1,10 +1,10 @@
 /**
   Copyright (c) 2011-2017, ARM Limited. All rights reserved.
-
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include "PrePi.h"
+#include <Library/ArmLib.h>
+#include <Library/PcdLib.h>
 
 #include <Chipset/AArch64.h>
 

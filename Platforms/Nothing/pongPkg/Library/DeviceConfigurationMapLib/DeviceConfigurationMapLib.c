@@ -3,6 +3,7 @@
 STATIC
 CONFIGURATION_DESCRIPTOR_EX
 gDeviceConfigurationDescriptorEx[] = {
+  // Configuration Map
   {"EnableShell", 0x1},
   {"SecPagePoolCount", 0x800},
   {"SharedIMEMBaseAddr", 0x146AA000},
@@ -47,8 +48,8 @@ gDeviceConfigurationDescriptorEx[] = {
   {"Terminator", 0xFFFFFFFF}
 };
 
-CONFIGURATION_DESCRIPTOR_EX
-*GetDeviceConfigurationMap()
+CONFIGURATION_DESCRIPTOR_EX*
+GetDeviceConfigurationMap ()
 {
   return gDeviceConfigurationDescriptorEx;
 }

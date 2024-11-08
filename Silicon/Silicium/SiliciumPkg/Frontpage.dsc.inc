@@ -13,7 +13,7 @@
   #
   # This library is for showing the main system boot graphics.
   #
-  BootGraphicsLib|SiliciumPkg/Library/BootGraphicsLib/BootGraphicsLib.inf
+  BootGraphicsLib|MsGraphicsPkg/Library/BootGraphicsLib/BootGraphicsLib.inf
 
   #
   # BootGraphicsProviderLib that uses PCDs and raw files in the firmware volumes
@@ -29,6 +29,11 @@
   # This is the Thermal Services Library that encapsulates the platform specific thermal information.
   #
   ThermalServicesLib|PcBdsPkg/Library/ThermalServicesLibNull/ThermalServicesLibNull.inf
+
+  #
+  # Null Power Services Library class to support Platforms that dont have battery
+  #
+  PowerServicesLib|PcBdsPkg/Library/PowerServicesLibNull/PowerServicesLibNull.inf
 
   #
   # Empty Platform Library of power check.
@@ -47,6 +52,16 @@
   #
   DeviceBootManagerLib|SiliciumPkg/Library/DeviceBootManagerLib/DeviceBootManagerLib.inf
   MsPlatformDevicesLib|SiliciumPkg/Library/MsPlatformDevicesLib/MsPlatformDevicesLib.inf
+
+  #
+  # LIbrary to display the On screen notifications for the platform
+  #
+  UiRectangleLib|MsGraphicsPkg/Library/BaseUiRectangleLib/BaseUiRectangleLib.inf
+
+  #
+  # display the device state notifications for the platform using color bars
+  #
+  DisplayDeviceStateLib|MsGraphicsPkg/Library/ColorBarDisplayDeviceStateLib/ColorBarDisplayDeviceStateLib.inf
 
   #
   # interfaces with alternate boot variable
@@ -132,8 +147,8 @@
 
   gMsGraphicsPkgTokenSpaceGuid.PcdUiThemeInDxe|TRUE
 
-  gOemPkgTokenSpaceGuid.PcdUefiVersionNumber|0x0000026
-  gOemPkgTokenSpaceGuid.PcdUefiBuildDate|0x20240505
+  gOemPkgTokenSpaceGuid.PcdUefiVersionNumber|0x0000030
+  gOemPkgTokenSpaceGuid.PcdUefiBuildDate|0x20240927
 
   gOemPkgTokenSpaceGuid.PcdPostBackgroundColor|0x0
 

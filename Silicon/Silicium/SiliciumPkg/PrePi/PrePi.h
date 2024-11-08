@@ -7,26 +7,13 @@
 #ifndef _PREPI_H_
 #define _PREPI_H_
 
-#include <PiPei.h>
+STATIC UINT64 mSystemMemoryEnd = FixedPcdGet64 (PcdSystemMemoryBase) + FixedPcdGet64 (PcdSystemMemorySize) - 1;
 
-#include <Library/PcdLib.h>
-#include <Library/ArmLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/HobLib.h>
-#include <Library/SerialPortLib.h>
-#include <Library/ArmPlatformLib.h>
-
-extern UINT64 mSystemMemoryEnd;
+#define IS_XIP() (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > mSystemMemoryEnd) || ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= FixedPcdGet64 (PcdSystemMemoryBase)))
 
 RETURN_STATUS
 EFIAPI
 TimerConstructor ();
-
-VOID
-PrePiMain (IN UINT64 StartTimeStamp);
 
 EFI_STATUS
 EFIAPI
@@ -38,15 +25,6 @@ MemoryPeim (
 EFI_STATUS
 EFIAPI
 PlatformPeim ();
-
-VOID
-BuildMemoryTypeInformationHob ();
-
-EFI_STATUS
-GetPlatformPpi (
-  IN  EFI_GUID  *PpiGuid,
-  OUT VOID     **Ppi
-  );
 
 VOID
 ArchInitialize ();

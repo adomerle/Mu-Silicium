@@ -1,5 +1,4 @@
 APRIORI DXE {
-
   # First, install the PCD driver and call DxeInit
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -17,7 +16,6 @@ APRIORI DXE {
   # Core Drivers
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/ginkgo/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
 
@@ -42,7 +40,7 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
-  # 8063CC34-459F-0B38-AF28-3BACE2E435A6 (Unknown)
+  # SdccDxe_SDBoot
   INF Binaries/ginkgo/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
   INF Binaries/ginkgo/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
 

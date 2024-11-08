@@ -1,20 +1,19 @@
-## @file
-#  Copyright (c) 2015 Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2011-2017, ARM Ltd. All rights reserved.<BR>
-#  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+##
+#  Copyright (c) 2015 Hewlett-Packard Development Company, L.P.
+#  Copyright (c) 2011-2017, ARM Ltd. All rights reserved.
+#  Copyright (c) 2020, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmPlatformPrePiUniCore
-  FILE_GUID                      = 3E401783-CC94-4FCD-97BC-BD35AC369D2F
+  BASE_NAME                      = PrePi
+  FILE_GUID                      = F417E00C-9C37-44F9-8717-2A5F3F369DDD
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
 [Sources]
-  PrePi.h
   PrePi.c
 
 [Sources.AArch64]
@@ -34,26 +33,23 @@
   SiliciumPkg/SiliciumPkg.dec
 
 [LibraryClasses]
-  BaseLib
   CacheMaintenanceLib
-  DebugLib
-  DebugAgentLib
-  ArmLib
-  IoLib
-  TimerLib
-  SerialPortLib
-  ExtractGuidedSectionLib
   DebugAgentLib
   PrePiLib
-  ArmPlatformLib
-  ArmPlatformStackLib
-  MemoryAllocationLib
-  HobLib
   PrePiHobListPointerLib
-  PlatformPeiLib
-  MemoryInitPeiLib
-  PlatformPrePiLib
+  TimerLib
+  PerformanceLib
   MemoryMapHelperLib
+  SoCPlatformLib
+  PcdLib
+  BaseMemoryLib
+  DebugLib
+  SerialPortLib
+  PlatformPrePiLib
+  DevicePrePiLib
+  MemoryInitPeiLib
+  PlatformPeiLib
+  MemoryProtectionLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
@@ -61,47 +57,25 @@
 [Guids]
   gArmMpCoreInfoGuid
   gEfiFirmwarePerformanceGuid
-
-[FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
-  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gMmMemoryProtectionSettingsGuid
+  gDxeMemoryProtectionSettingsGuid
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdVFPEnabled
-
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFdSize
-
-  gArmTokenSpaceGuid.PcdFvBaseAddress
-  gArmTokenSpaceGuid.PcdFvSize
-
-  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
-
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount
 
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
-
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
-
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize
 
+  gSiliciumPkgTokenSpaceGuid.PcdSmbiosSystemModel
+
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize

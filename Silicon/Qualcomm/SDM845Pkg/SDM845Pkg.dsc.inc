@@ -1,5 +1,4 @@
 ##
-#
 #  Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.
@@ -7,20 +6,22 @@
 #  Copyright (c) Microsoft Corporation.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
 ##
 
 [Defines]
+  # GIC
+  USE_CUSTOM_GIC                             = 0
+
   # Timer
-  USE_CUSTOM_GIC     = 0
-  USE_CUSTOM_TIMER   = 0
-  USE_PHYSICAL_TIMER = 1
+  USE_CUSTOM_TIMER                           = 0
+  USE_PHYSICAL_TIMER                         = 1
 
   # KEP
-  PLATFORM_HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA         = 0
-  PLATFORM_HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA   = 0
-  PLATFORM_HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA = 0
-  PLATFORM_HAS_PSCI_MEMPROTECT_FAILING_ERRATA         = 1
+  ENABLE_KEP                                 = 1
+  HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA         = 0
+  HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA   = 0
+  HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA = 0
+  HAS_PSCI_MEMPROTECT_FAILING_ERRATA         = 1
 
 [BuildOptions]
   *_*_AARCH64_CC_FLAGS = -march=armv8-a+crypto+rcpc
@@ -48,11 +49,16 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|2
   gQcomPkgTokenSpaceGuid.PcdHasLevel3Cache|FALSE
 
-  # Power Services
-  gQcomPkgTokenSpaceGuid.PcdIsPowerOkImplemented|FALSE
+  # CPU Max Freq
+  gQcomPkgTokenSpaceGuid.PcdMaxFreqSupported|TRUE
+
+  # Platform Pei HOBs
+  gQcomPkgTokenSpaceGuid.PcdEnableInfoBlkHob|TRUE
+  gQcomPkgTokenSpaceGuid.PcdEnableShimHob|TRUE
+  gQcomPkgTokenSpaceGuid.PcdEnableFvDecompressHob|FALSE
+  gQcomPkgTokenSpaceGuid.PcdEnableProdmodeHob|FALSE
 
 [LibraryClasses]
-  PlatformPeiLib|SDM845Pkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   PlatformPrePiLib|SDM845Pkg/Library/PlatformPrePiLib/PlatformPrePiLib.inf
   AcpiPlatformUpdateLib|SDM845Pkg/Library/AcpiPlatformUpdateLib/AcpiPlatformUpdateLib.inf
   HwResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf

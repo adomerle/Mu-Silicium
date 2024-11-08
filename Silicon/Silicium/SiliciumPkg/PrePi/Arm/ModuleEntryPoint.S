@@ -10,81 +10,65 @@
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
-//
 
 #include <AsmMacroIoLib.h>
-#include <Library/PcdLib.h>
-#include <Chipset/ArmV7.h>
 
-#define LoadConstantToReg(Data, Reg) \
-    ldr Reg, =Data
+ASM_FUNC (_ModuleEntryPoint)
+  // Run Platform Specific Code
+  bl   ASM_PFX (PlaformAssemblyInit)
 
-.global _StackBase
-.global _StackSize
+  // Get MpId
+  bl   ASM_PFX (ArmReadMpidr)
 
-_StackBase:
-  .quad FixedPcdGet32(PcdPrePiStackBase)
+  // Save MpId
+  mov  r8, r0
 
-_StackSize:
-  .quad FixedPcdGet32(PcdPrePiStackSize)
+SetupExceptionVector:
+  // Get Exception Vector Address
+  ldr  r0, =FixedPcdGet64(PcdCpuVectorBaseAddress)
 
-ASM_FUNC(_ModuleEntryPoint)
-  mov r0, #0
-  bl ASM_PFX(ArmReadMpidr)
-  mov r8, r0
+  // Setup Exception Loop
+  ldr  r1, NeverReturn
+  mov  r2, #0
 
-  /* First ensure all interrupts are disabled */
-  bl ASM_PFX(ArmDisableInterrupts)
+FillVectors:
+  // Fill every 8 Bytes
+  str  r1, [r0, r2]
+  adds r2, r2, #8
+  cmp  r2, #0x800
+  bne  FillVectors
 
-  /* Ensure that the MMU and caches are off */
-  bl ASM_PFX(ArmDisableCachesAndMmu)
+SetupCoreStack:
+  // Get Stack Base & Size
+  ldr  r0, =FixedPcdGet32(PcdPrePiStackBase)
+  ldr  r1, =FixedPcdGet32(PcdPrePiStackSize)
 
-  /* Invalide I-Cache */
-  bl ASM_PFX(ArmInvalidateInstructionCache)
-
-  /* Invalidate TLB */
-  bl ASM_PFX(ArmInvalidateTlb)
-
-_SetupExceptionVector:
-  LoadConstantToReg (FixedPcdGet32(PcdCpuVectorBaseAddress), r0)
-  ldr r1, _NeverReturn
-  mov r2, #0
-
-_FillVectors:
-  str     r1, [r0, r2]
-  adds    r2, r2, #8      /* Fill every 8 byte */
-  cmp     r2, #0x800      /* Vector Table Size */
-  bne     _FillVectors
-
-_SetupPrimaryCoreStack:
-  ldr r0, _StackBase     /* Stack base arg0 */
-  ldr r1, _StackSize     /* Stack size arg1 */
-
+  // Set Core Stack
   add r4, r0, r1
   add sp, r4, #0
 
-_EnableCache:
-  bl ArmInvalidateDataCache
-  bl ASM_PFX(ArmEnableInstructionCache)
-  bl ASM_PFX(ArmEnableDataCache)
+EnableCaches:
+  // Invalidate D-Cache
+  bl   ArmInvalidateDataCache
 
-_PrepareArguments:
-  mov   r0, r8
-  ldr   r1, _StackBase
-  ldr   r2, _StackSize
-  mov   r3, sp
+  // Enable I-Cache & D-Cache
+  bl   ASM_PFX(ArmEnableInstructionCache)
+  bl   ASM_PFX(ArmEnableDataCache)
 
-  // Move sec startup address into a data register
-  // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   r4, =ASM_PFX(CEntryPoint)
+JumpToC:
+  // Restore Values
+  mov  r0, r8
+  mov  r1, =FixedPcdGet32(PcdPrePiStackBase)
+  mov  r2, =FixedPcdGet32(PcdPrePiStackSize)
+  mov  r3, sp
 
-  // Jump to PrePiCore C code
-  //    r0 = MpId
-  //    r1 = UefiMemoryBase
-  //    r2 = StacksBase
-  blx   r4
+  // Set Jump Location
+  ldr  r4, =ASM_PFX (CEntryPoint)
 
-_NeverReturn:
-  b _NeverReturn
+  // Jump to C Code
+  blx  r4
+
+NeverReturn:
+  b NeverReturn
 
 .align 3

@@ -29,7 +29,6 @@
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
 
   INF Binaries/poplar/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
   INF Binaries/poplar/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
@@ -106,4 +105,6 @@
   INF Binaries/poplar/SomcPkg/Drivers/XBootPALDxe/XBootPALDxe.inf
   INF Binaries/poplar/SomcPkg/Drivers/XDeviceTreeDxe/XDeviceTreeDxe.inf
   INF Binaries/poplar/SomcPkg/Drivers/TaDxe/TaDxe.inf
+!if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/poplar/SomcPkg/Drivers/XDisplayDxe/XDisplayDxe.inf
+!endif

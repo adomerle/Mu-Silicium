@@ -26,6 +26,7 @@
   USE_CUSTOM_DISPLAY_DRIVER      = 0
   HAS_BUILD_IN_KEYBOARD          = 0
 
+  #
   # 0 = ODNX02-A2
   # 1 = TM670D-A1
   # 2 = TM670M-A2
@@ -33,6 +34,7 @@
   # 4 = TM660M-A2
   # 5 = ODNX10-A1
   # 6 = TM675M-A1
+  #
 !if $(DEVICE_MODEL) == 0
   SOC_TYPE                       = 0
 !elseif $(DEVICE_MODEL) == 1
@@ -47,14 +49,14 @@
 [LibraryClasses]
   DeviceMemoryMapLib|HAC-001Pkg/Library/DeviceMemoryMapLib/DeviceMemoryMapLib.inf
   KeypadDeviceLib|HAC-001Pkg/Library/KeypadDeviceLib/KeypadDeviceLib.inf
+  DevicePrePiLib|HAC-001Pkg/Library/DevicePrePiLib/DevicePrePiLib.inf
 
 [PcdsFixedAtBuild]
-  # DDR Start Address & DDR RAM Size (4 GB)
+  # DDR Start Address
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x100000000
 
   # Device Maintainer
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor|L"Robotix22"
+  gSiliciumPkgTokenSpaceGuid.PcdDeviceMaintainer|"Robotix"
 
   # CPU Vector Address
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80200000
@@ -79,6 +81,9 @@
   gSiliciumPkgTokenSpaceGuid.PcdMipiFrameBufferWidth|720
   gSiliciumPkgTokenSpaceGuid.PcdMipiFrameBufferHeight|1280
   gSiliciumPkgTokenSpaceGuid.PcdMipiFrameBufferColorDepth|32
+
+  # Dynamic RAM
+  gNvidiaPkgTokenSpaceGuid.PcdRamPartitionBase|0xF5D85000
 
 [Components]
   # Keypad
